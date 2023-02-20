@@ -2,7 +2,7 @@ from typing import Type
 
 from django.contrib.auth.tokens import default_token_generator
 from django.db import models
-from django.db.models import Count, Exists, OuterRef, Sum
+from django.db.models import Count, Exists, OuterRef, Sum, Subquery
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.conf import settings
@@ -12,12 +12,13 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework import filters
 
 from recipes.models import (Favorite, Follow, Ingredient, IngredientRecipe,
                             Recipe, ShoppingCart, Tag)
 from users.models import User
 
-from .filters import RecipeFilter
+from .filters import RecipeFilter, CustomSearchFilter
 from .permissions import AuthorPermission, ReadOnly
 from .serializers import (FavoriteSerializer, FollowSerializer,
                           IngredientSerializer, MyUserAndRecipeSerializer,
@@ -110,6 +111,8 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     permission_classes = (ReadOnly,)
     pagination_class = None
     search_fields = ('^name',)
+    filter_backends = (CustomSearchFilter,)
+
 
 
 class RecipeViewSet(ModelViewSet):
@@ -146,16 +149,18 @@ class RecipeViewSet(ModelViewSet):
 
     def get_queryset(self):
         if self.request.user.is_authenticated:
-            return Recipe.objects.annotate(
+            recipes = Recipe.objects.all()
+            recipes.annotate(is_subscribed=Exists(Follow.objects.filter(
+                    user=self.request.user, author=recipes.values('author'))))
+            return recipes.annotate(
                 is_favorited=Exists(Favorite.objects.filter(
                     user=self.request.user, recipe=OuterRef('id'))),
                 is_in_shopping_cart=Exists(ShoppingCart.objects.filter(
-                    user=self.request.user, recipe=OuterRef('id'))))
+                    user=self.request.user, recipe=OuterRef('id')))
+                )
 
         return super().get_queryset()
 
-    # это общая функция для добавления в избранное и в список покупок
-    # т.к логика одинаковая, я пыталась написать нормально, но ...
     def _add_to_shopping_or_favorite(
             self, Model: Type[models.base.ModelBase], request, word, *args, **kwargs):
         recipe = get_object_or_404(Recipe, id=self.kwargs.get('id'))
@@ -189,13 +194,12 @@ class RecipeViewSet(ModelViewSet):
     @action(methods=['GET'], detail=False)
     def download_shopping_cart(self, request, *args, **kwargs):
         user = request.user
-        ing = 'Список покупок:\n'
+        ing = "Список покупок: "
         ingredients_list = IngredientRecipe.objects.filter(
             recipe__selected_recipe_cart__user=user).values(
             'ingredients__name',
             'ingredients__measurement_unit').annotate(
             Sum('amount'))
         for item in ingredients_list:
-            ing += item['ingredients__name'] + ' ' + str(
-                item['amount__sum']) + ' ' + item['ingredients__measurement_unit'] + '\n'
+            ing += f"{item['ingredients__name']} ({item['ingredients__measurement_unit']}) - {str(item['amount__sum'])} ; "
         return Response(ing, content_type='text/plain')

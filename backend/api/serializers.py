@@ -96,7 +96,7 @@ class ReadRecipeSerializer(serializers.ModelSerializer):
     ingredients = ReadIngredientRecipeSerializer(many=True, source='recipe')
     is_favorited = serializers.BooleanField(default=False)
     is_in_shopping_cart = serializers.BooleanField(default=False)
-
+    is_subscribed = serializers.BooleanField(required=False, default=False)
     class Meta:
         model = Recipe
         fields = (
@@ -110,7 +110,8 @@ class ReadRecipeSerializer(serializers.ModelSerializer):
             'name',
             'text',
             'pub_date',
-            'cooking_time')
+            'cooking_time',
+            'is_subscribed')
 
 
 class WriteRecipeSerializer(serializers.ModelSerializer):
@@ -202,9 +203,6 @@ class FollowSerializer(serializers.ModelSerializer):
     """Дополнительный сериализатор, чтобы создать запись при подписке в БД."""
     class Meta:
         model = Follow
-        #  а почему бы и нет ...
         fields = ()
-        read_only_fielgs = ('user', 'author')
-
     def to_representation(self, instance):
         return MyUserAndRecipeSerializer(instance).data

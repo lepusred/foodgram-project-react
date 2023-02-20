@@ -7,6 +7,7 @@ Content-Type: application/json
 "username": "win",
 "email": "win@win.ru",
 "first_name": "win",
+"last_name": "win",
 "password":"win090909"
 }
 
@@ -100,11 +101,11 @@ Content-Type: application/json
 ###
 GET  http://127.0.0.1/api/users/me/
 Content-Type: application/json
-Authorization: Token edebca6ee74a85e46e738b5d8558f89022143799
+Authorization: Token 198111e4dababfec073316634600e6ff49ede9a7
 ###
 GET  http://127.0.0.1/api/recipes/
 Content-Type: application/json
-Authorization: Token 198111e4dababfec073316634600e6ff49ede9a7
+#Authorization: Token 24f30db4396c578094e4e6a6b4dcb29b97d414bc
 
 ###
 POST  http://127.0.0.1:8000/api/users/set_password/
@@ -142,7 +143,7 @@ Content-Type: application/json
 
 ###
 POST http://localhost/api/users/2/subscribe/
-#Authorization: Token  24f30db4396c578094e4e6a6b4dcb29b97d414bc
+Authorization: Token  24f30db4396c578094e4e6a6b4dcb29b97d414bc
 ###
 GET  http://localhost/api/users/subscriptions/
 Authorization: Token 24f30db4396c578094e4e6a6b4dcb29b97d414bc
@@ -160,9 +161,11 @@ GET  http://localhost/api/users/?is_in_shopping_cart=1
 Authorization: Token  198111e4dababfec073316634600e6ff49ede9a7
 
 ###
-GET http://localhost/api/recipes/?is_in_shopping_cart=1&is_favorited=1
+POST http://localhost/api/recipes/127/shopping_cart/
 Authorization: Token  198111e4dababfec073316634600e6ff49ede9a7
 
 ###
-GET  http://localhost/api/recipes/download_shopping_cart
+GET  http://localhost/api/recipes/download_shopping_cart/
 Authorization: Token  198111e4dababfec073316634600e6ff49ede9a7
+###
+GET http://localhost/api/ingredients/?search=глюкоза

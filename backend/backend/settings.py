@@ -6,10 +6,8 @@ load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SECRET_KEY = os.getenv(
-    'SECRET_KEY',
-    default='#v7^dbe)=7g$!__n9jg1(uu98eo3qfg&_2(#-gksvu0ng_7ff@')
-DEBUG = True
+SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = [
     '*',
@@ -17,6 +15,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'testserver',
     'localhost:8000',
+    '84.201.139.124',
 ]
 
 
@@ -126,10 +125,10 @@ USE_TZ = True
 STATIC_URL = '/static/django/'
 
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/django/')
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/django/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/django')
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -144,7 +143,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 6,
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
-    ],
+    ]
 }
 
 AUTH_USER_MODEL = 'users.User'

@@ -3,29 +3,43 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import F, Q
 
-from backend.settings import AUTH_USER_MODEL
+from django.conf import settings
 
 
 class Ingredient(models.Model):
-    """Модель ингридиента."""
-    name = models.TextField()
-    measurement_unit = models.TextField()
+    """Модель ингредиента."""
+    name = models.TextField(verbose_name='название ингредиента')
+    measurement_unit = models.CharField(max_length=150, verbose_name='единицы измерения')
+
+    def __str__(self):
+        return f'{self.name},{self.measurement_unit}'
+
+    class Meta:
+        verbose_name_plural = 'Ингредиенты'
+        verbose_name = 'Ингредиент'
 
 
 class Tag(models.Model):
     """Модель тега."""
-    name = models.TextField()
+    name = models.CharField(max_length=150, verbose_name='название тега')
     slug = models.SlugField(unique=True)
     color = ColorField(default='#FF0000')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = 'Теги'
+        verbose_name = 'Тег'
 
 
 class Recipe(models.Model):
     """Модель рецепта."""
-    name = models.CharField(max_length=200)
-    text = models.TextField()
+    name = models.CharField(max_length=200, verbose_name="название рецепта")
+    text = models.TextField(verbose_name="описание рецепта")
     pub_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(
-        AUTH_USER_MODEL,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='recipes'
     )
@@ -44,22 +58,23 @@ class Recipe(models.Model):
     cooking_time = models.IntegerField(validators=(MinValueValidator(1),))
 
     def __str__(self):
-        return self.text[:15]
+        return f'{self.name}-{self.text[:15]}'
 
     class Meta:
         ordering = ['-pub_date']
         verbose_name_plural = 'Рецепты'
+        verbose_name = 'Рецепт'
 
 
 class Follow(models.Model):
     """Модель подписок, связывает пользователя и автора."""
     user = models.ForeignKey(
-        AUTH_USER_MODEL,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='follower', null=False, blank=False
     )
     author = models.ForeignKey(
-        AUTH_USER_MODEL,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='following'
     )
@@ -108,7 +123,7 @@ class TagRecipe(models.Model):
 class Favorite(models.Model):
     """Модель избранное связывает пользователя и рецепт."""
     user = models.ForeignKey(
-        AUTH_USER_MODEL,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='selector', null=False, blank=False
     )
@@ -130,7 +145,7 @@ class Favorite(models.Model):
 class ShoppingCart(models.Model):
     """Модель список покупок связывает пользователя и рецепт."""
     user = models.ForeignKey(
-        AUTH_USER_MODEL,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='selector_cart', null=False, blank=False
     )

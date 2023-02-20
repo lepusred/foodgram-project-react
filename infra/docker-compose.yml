@@ -16,8 +16,8 @@ services:
       dockerfile: Dockerfile
     restart: always
     volumes:
-      - static_value:/app/static/
-      - media_value:/app/media/
+      - static_value:/app/static/django/
+      - media_value:/app/media/django/
     depends_on:
       - db
     env_file:
@@ -40,7 +40,7 @@ services:
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
       - static_value:/var/html/static/django/
-      - media_value:/var/html/media/
+      - media_value:/var/html/media/django/
     depends_on:
       - web
 
