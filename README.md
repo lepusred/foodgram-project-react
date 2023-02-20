@@ -28,13 +28,13 @@
 Клонируйте репозиторий в командной строке в нужную вам папку:
 
 ```
-git clone https://github.com/lepusred/yamdb_final.git
+git clone https://github.com/lepusred/foodgram-project-react.git
 ```
 
-Перейдите в папку yamdb_final:
+Перейдите в папку foodgram-project-react:
 
 ```
-cd /yamdb_final
+cd /foodgram-project-react
 ```
 
 Cоберите контейнеры и запустите их внутри этой папки
@@ -63,4 +63,4 @@ docker-compose exec web python manage.py collectstatic --no-input
 
 Можно посмотреть список эндпоинов по ссылке
 
-[http://127.0.0.1:80/redoc](http://84.201.139.124/api/docs/)/ 
+[http://84.201.139.124/api/docs/](http://84.201.139.124/api/docs/)
