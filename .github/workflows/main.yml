@@ -3,20 +3,6 @@ name: Django-app workflow
 on: [push]
 
 jobs:
-  tests: 
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.7
-
-    - name: Install dependencies
-      run: | 
-        python -m pip install --upgrade pip 
-        pip install -r ./backend/requirements.txt 
 
   build_and_push_to_docker_hub:
     name: Push Docker image to Docker Hub
@@ -61,4 +47,4 @@ jobs:
             echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
             echo DEBUG=${{ secrets.DEBUG }} >> .env
             sudo systemctl stop nginx
-            sudo docker-compose up -d && docker-compose exec -T web python manage.py migrate && docker-compose exec -T web python manage.py collectstatic --no-input
+            sudo docker-compose up --build -d && docker-compose exec -T web python manage.py migrate && docker-compose exec -T web python manage.py collectstatic --no-input
