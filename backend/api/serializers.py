@@ -1,4 +1,3 @@
-# осторожно здесь происходят необъяснимые явления
 import base64
 
 from django.core.files.base import ContentFile
@@ -97,6 +96,7 @@ class ReadRecipeSerializer(serializers.ModelSerializer):
     is_favorited = serializers.BooleanField(default=False)
     is_in_shopping_cart = serializers.BooleanField(default=False)
     is_subscribed = serializers.BooleanField(required=False, default=False)
+
     class Meta:
         model = Recipe
         fields = (
@@ -204,5 +204,6 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         fields = ()
+
     def to_representation(self, instance):
         return MyUserAndRecipeSerializer(instance).data

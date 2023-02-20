@@ -2,7 +2,7 @@ from typing import Type
 
 from django.contrib.auth.tokens import default_token_generator
 from django.db import models
-from django.db.models import Count, Exists, OuterRef, Sum, Subquery
+from django.db.models import Count, Exists, OuterRef, Sum
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.conf import settings
@@ -12,13 +12,12 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from rest_framework import filters
 
 from recipes.models import (Favorite, Follow, Ingredient, IngredientRecipe,
                             Recipe, ShoppingCart, Tag)
 from users.models import User
 
-from .filters import RecipeFilter, CustomSearchFilter
+from .filters import CustomSearchFilter, RecipeFilter
 from .permissions import AuthorPermission, ReadOnly
 from .serializers import (FavoriteSerializer, FollowSerializer,
                           IngredientSerializer, MyUserAndRecipeSerializer,
@@ -62,10 +61,6 @@ class MyUserViewSet(UserViewSet):
             return (ReadOnly(),)
         return super().get_permissions()
 
-    # страница подписок, да выглядит страшновато
-    # я понимаю, что логику лучше через встроенные функции писать и сериализатор
-    # но видимо я придумала неудачную логику с сериализаторами и получилось
-    # это ...;(
     @action(methods=['POST', 'DELETE'], detail=True, serializer_class=FollowSerializer,
             permission_classes=[IsAuthenticated,])
     def subscribe(self, request, *args, **kwargs):
@@ -114,7 +109,6 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     filter_backends = (CustomSearchFilter,)
 
 
-
 class RecipeViewSet(ModelViewSet):
     """Вьюсет рецепта."""
     queryset = Recipe.objects.all()
@@ -151,13 +145,13 @@ class RecipeViewSet(ModelViewSet):
         if self.request.user.is_authenticated:
             recipes = Recipe.objects.all()
             recipes.annotate(is_subscribed=Exists(Follow.objects.filter(
-                    user=self.request.user, author=recipes.values('author'))))
+                user=self.request.user, author=recipes.values('author'))))
             return recipes.annotate(
                 is_favorited=Exists(Favorite.objects.filter(
                     user=self.request.user, recipe=OuterRef('id'))),
                 is_in_shopping_cart=Exists(ShoppingCart.objects.filter(
                     user=self.request.user, recipe=OuterRef('id')))
-                )
+            )
 
         return super().get_queryset()
 
@@ -194,7 +188,7 @@ class RecipeViewSet(ModelViewSet):
     @action(methods=['GET'], detail=False)
     def download_shopping_cart(self, request, *args, **kwargs):
         user = request.user
-        ing = "Список покупок: "
+        ing = 'Список покупок: '
         ingredients_list = IngredientRecipe.objects.filter(
             recipe__selected_recipe_cart__user=user).values(
             'ingredients__name',

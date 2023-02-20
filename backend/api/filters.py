@@ -1,5 +1,6 @@
 from django_filters import rest_framework
 from rest_framework import filters
+
 from recipes.models import Recipe
 
 
@@ -16,4 +17,4 @@ class RecipeFilter(rest_framework.FilterSet):
 
 
 class CustomSearchFilter(filters.SearchFilter):
-    search_param = "name"
+    search_param = 'name'

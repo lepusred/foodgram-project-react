@@ -1,15 +1,15 @@
 from colorfield.fields import ColorField
+from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import F, Q
-
-from django.conf import settings
 
 
 class Ingredient(models.Model):
     """Модель ингредиента."""
     name = models.TextField(verbose_name='название ингредиента')
-    measurement_unit = models.CharField(max_length=150, verbose_name='единицы измерения')
+    measurement_unit = models.CharField(
+        max_length=150, verbose_name='единицы измерения')
 
     def __str__(self):
         return f'{self.name},{self.measurement_unit}'
@@ -35,8 +35,8 @@ class Tag(models.Model):
 
 class Recipe(models.Model):
     """Модель рецепта."""
-    name = models.CharField(max_length=200, verbose_name="название рецепта")
-    text = models.TextField(verbose_name="описание рецепта")
+    name = models.CharField(max_length=200, verbose_name='название рецепта')
+    text = models.TextField(verbose_name='описание рецепта')
     pub_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
