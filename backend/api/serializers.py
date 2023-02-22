@@ -56,6 +56,12 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
         model = IngredientRecipe
         fields = ('id', 'amount', 'recipe')
 
+    def validate_date(self, data):
+        if data['ingredients'] is None:
+            raise serializers.ValidationError(
+                'Добавьте хотя бы один ингредиент')
+        return data
+
 
 class ReadTagRecipeSerializer(serializers.ModelSerializer):
     """Этот сериализатор используется для отображения тегов при чтении
@@ -170,6 +176,12 @@ class WriteRecipeSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return ReadRecipeSerializer(instance).data
+
+    def validate_date(self, data):
+        if data['cooking_time'] < 1 or isinstance(self.cooking_time, float):
+            raise serializers.ValidationError(
+                'Время готовки должно быть целым больше 1')
+        return data
 
 
 class FavoriteSerializer(serializers.ModelSerializer):

@@ -9,7 +9,7 @@ class Ingredient(models.Model):
     """Модель ингредиента."""
     name = models.TextField(verbose_name='название ингредиента')
     measurement_unit = models.CharField(
-        max_length=150, verbose_name='единицы измерения')
+        max_length=10, verbose_name='единицы измерения')
 
     def __str__(self):
         return f'{self.name},{self.measurement_unit}'
@@ -50,12 +50,11 @@ class Recipe(models.Model):
     )
     ingredients = models.ManyToManyField(
         Ingredient,
-        through='IngredientRecipe'
-    )
+        through='IngredientRecipe')
     tags = models.ManyToManyField(
-        Tag, through='TagRecipe'
-    )
-    cooking_time = models.IntegerField(validators=(MinValueValidator(1),))
+        Tag, through='TagRecipe')
+    cooking_time = models.PositiveSmallIntegerField(
+        validators=(MinValueValidator(1),))
 
     def __str__(self):
         return f'{self.name}-{self.text[:15]}'
@@ -71,7 +70,7 @@ class Follow(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='follower', null=False, blank=False
+        related_name='follower', blank=False
     )
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -95,14 +94,13 @@ class IngredientRecipe(models.Model):
     ingredients = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        null=False,
         related_name='ingredients')
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        null=False,
         related_name='recipe')
-    amount = models.FloatField(null=False)
+    amount = models.PositiveSmallIntegerField(validators=(MinValueValidator(1),),
+                                              error_messages={'invalid': 'Выберите целое значение больше 1'})
 
 
 class TagRecipe(models.Model):
@@ -125,7 +123,7 @@ class Favorite(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='selector', null=False, blank=False
+        related_name='selector', blank=False
     )
     recipe = models.ForeignKey(
         Recipe,
@@ -147,7 +145,7 @@ class ShoppingCart(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='selector_cart', null=False, blank=False
+        related_name='selector_cart', blank=False
     )
     recipe = models.ForeignKey(
         Recipe,
