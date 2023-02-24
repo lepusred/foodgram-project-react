@@ -1,6 +1,7 @@
 import base64
 
 from django.core.files.base import ContentFile
+from django.core.paginator import Paginator
 from rest_framework import serializers
 
 from recipes.models import (Follow, Ingredient, IngredientRecipe, Recipe, Tag,
@@ -195,7 +196,7 @@ class MyUserAndRecipeSerializer(serializers.ModelSerializer):
     """Агрегирующий сериализатор для отображения данных после подпски на автора
     и при чтении моих подписок."""
     recipes_count = serializers.SerializerMethodField()
-    recipes = FavoriteSerializer(many=True, read_only=True)
+    recipes = serializers.SerializerMethodField()
     is_subscribed = serializers.BooleanField(read_only=True)
     recipes_count = serializers.IntegerField()
 
@@ -209,7 +210,13 @@ class MyUserAndRecipeSerializer(serializers.ModelSerializer):
             'last_name',
             'is_subscribed', 'recipes', 'recipes_count',
         )
-
+    def get_recipes(self, obj):
+        page_size = self.context['request'].query_params.get('recipes_limit') or 1
+        paginator = Paginator(obj.recipes.all(), page_size)
+        page = self.context['request'].query_params.get('page') or 1
+        recipes = paginator.page(page)
+        serializer = FavoriteSerializer(recipes, many=True)
+        return serializer.data
 
 class FollowSerializer(serializers.ModelSerializer):
     """Дополнительный сериализатор, чтобы создать запись при подписке в БД."""
