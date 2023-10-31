@@ -1,7 +1,7 @@
 [
 {
   "model": "admin.logentry",
-  "pk": 1,
+  "pk": 12,
   "fields": {
     "action_time": "2023-02-18T04:41:30.815Z",
     "user": 2,
