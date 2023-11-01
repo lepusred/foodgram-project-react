@@ -1,11 +1,7 @@
 
 ![foodgram-project-react](https://github.com/lepusred/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)
   
-##### Проект доступен по адресу: http://84.201.139.124/
 
-Администратор:
-логин: iop@iop.ru
-пароль: iop090909
 
 ### Описание:
 
